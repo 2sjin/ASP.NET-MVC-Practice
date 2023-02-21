@@ -1,4 +1,6 @@
 ﻿
+@model List<WebApplication1.Models.Document>
+
 @{
     Layout = null;
 }
@@ -21,11 +23,11 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i=1; i<=10; i++) {
+            @foreach (var item in Model) {
                 <tr>
-                    <td>@i</td>
-                    <td>제목입니다.</td>
-                    <td>2sjin</td>
+                    <td>@item.Id</td>
+                    <td>@item.Title</td>
+                    <td>@item.Writer</td>
                 </tr>
             }
         </tbody>
