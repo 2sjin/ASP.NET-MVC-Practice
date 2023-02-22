@@ -1,9 +1,12 @@
 ﻿
-<!-- 주석 -->
+<!-- 컨트롤러로부터 return View()의 매개변수를 통해 전달받을 데이터 타입 -->
 @model List<WebApplication1.Models.Document>
 
 @{
     Layout = null;
+
+    // ViewData로 데이터를 전달받기 위해서는 형변환 필요
+    var member2 = ViewData["Member2"] as WebApplication1.Models.Member;
 }
 
 <!DOCTYPE html>
@@ -15,6 +18,11 @@
 </head>
 <body>
     <h1>This is List View</h1>
+    <div>
+        <p>
+            @(ViewBag.Member1.Name + "(" + member2.Id + ")님") 환영합니다.
+        </p>
+    </div>
     <table>
         <thead>
             <tr>
