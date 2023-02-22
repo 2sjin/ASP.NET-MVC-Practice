@@ -1,8 +1,56 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@using WebApplication1.Models;
+@{
+    Layout = null;
+
+    // 전달받은 ViewBag 데이터가 null일 경우, 새로운 객체로 대체함 
+    string[] arr = ViewBag.Arr ?? new string[] { };
+    Book book = ViewBag.Book ?? new Book();
+
+    int nowHour = DateTime.Now.Hour;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>View</title>
+</head>
+<body>
+    <div>
+        @foreach(string s in ViewBag.Arr) {
+            <div>@s</div>
+        }
+    </div>
+    
+    <br>
+
+    <div>
+        [[ 새로고침 시각 ]]
+        <br>@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        <br>
+        @if(nowHour < 12) {
+            <text>지금은 오전입니다.</text>
+        }
+        else {
+            <text>지금은 오후입니다.</text>
+        }
+    </div>
+
+    <div>
+        <ul>
+            <li>
+                제목 : @book.Title
+            </li>
+            <li>
+                작가 : @book.Writer
+            </li>
+        </ul>
+    </div>
+    
+    <div>
+        @@ 문자를 출력하고 싶으면 @@@@를 입력하면 됨.
+    </div>
+</body>
+</html>
