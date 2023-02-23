@@ -19,15 +19,21 @@ namespace LibraryApp.Controllers {
         // GET: Home
         public async Task<IActionResult> Index() {
             // 페이징(Paging)
-            int listCount = 3;
-            int pageNum = 1;
-            string[] queryStr = Request.QueryString.ToString().Split("=");
+            int listCount = 5;      // 한 번에 표시할 레코드 수
+            int pageNum = 1;        // 현재 페이지 번호
+            string[] queryStr = Request.QueryString.ToString().Split("=");  // 예) ["?page", 1]
 
             if (queryStr[0] == "?page" && queryStr[1] != null)
                 pageNum = Convert.ToInt32(queryStr[1]);
 
-            ViewBag.Page = pageNum;
-            var books = _context.Book.Take(listCount).ToListAsync();
+            // 페이지 정보를 뷰에 전달
+            ViewBag.PageNum = pageNum;
+            ViewBag.PageNumMax = (int) ((_context.Book.Count() - 1) / listCount) + 1;
+
+            // listCount개 만큼만 레코드 출력
+            int startNum = (pageNum - 1) * listCount;
+            var books = _context.Book.OrderBy(x => x.Book_U)
+                        .Skip(startNum).Take(listCount).ToListAsync();
             
             return View(await books);
         }
