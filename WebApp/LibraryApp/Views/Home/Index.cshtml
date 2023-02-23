@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    int pageNum = ViewBag.Page ?? 1;    // null 대신 1을 기본값으로 사용
 }
 
 <h1>Index</h1>
@@ -58,3 +59,13 @@
 }
     </tbody>
 </table>
+
+
+<!-- 페이징(Paging) 버튼 -->
+<div class="text-center">
+    <div class="btn-group">
+        <a class="btn btn-@(pageNum == 1 ? "primary" : "default")" href="?page=1">1</a>
+        <a class="btn btn-@(pageNum == 2 ? "primary" : "default")" href="?page=2">2</a>
+        <a class="btn btn-@(pageNum == 3 ? "primary" : "default")" href="?page=3">3</a>
+    </div>
+</div>
