@@ -34,19 +34,20 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                <!-- @Html.DisplayFor(modelItem => item.Title) -->
+                @item.Title
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Writer)
+                @item.Writer
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Summary)
+                @item.Summary
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Publisher)
+                @item.Publisher
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Published_date)
+                @item.Published_date
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Book_U">Edit</a> |
