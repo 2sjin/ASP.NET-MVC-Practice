@@ -21,8 +21,12 @@ namespace LibraryApp.Controllers {
             // 페이징(Paging)
             int listCount = 5;      // 한 번에 표시할 레코드 수
             int pageNum = 1;        // 현재 페이지 번호
-            string[] queryStr = Request.QueryString.ToString().Split("=");  // 예) ["?page", 1]
 
+            // 쿼리 스트링을 배열 형태로 저장
+            // 예) ["?page", 1]
+            string[] queryStr = Request.QueryString.ToString().Split("=");  
+
+            // 쿼리스트링에 저장된 현재 페이지를 정수 형태로 저장
             if (queryStr[0] == "?page" && queryStr[1] != null)
                 pageNum = Convert.ToInt32(queryStr[1]);
 
@@ -34,7 +38,16 @@ namespace LibraryApp.Controllers {
             int startNum = (pageNum - 1) * listCount;
             var books = _context.Book.OrderBy(x => x.Book_U)
                         .Skip(startNum).Take(listCount).ToListAsync();
-            
+
+            // 검색어 입력에 따른 필터링(책제목 기준)
+            // 1. 검색어 중 한글은 인식되지 않음(퍼센트 인코딩 형태로 인식됨)
+            // 2. 짧은 시간 안에 검색을 연속 수행하면 오류 발생
+            // (An unhandled exception occurred while processing the request.)
+            if (queryStr[0] == "?keyword" && !string.IsNullOrWhiteSpace(queryStr[1]))
+                books = _context.Book.Where(x => x.Title.Contains(queryStr[1]))
+                        .OrderBy(x => x.Book_U)
+                        .Skip(startNum).Take(listCount).ToListAsync();
+
             return View(await books);
         }
 
