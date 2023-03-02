@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryApp.Data;
 using LibraryApp.Models;
+using System.Web;
 
 namespace LibraryApp.Controllers {
     public class HomeController : Controller {
@@ -40,13 +41,17 @@ namespace LibraryApp.Controllers {
                         .Skip(startNum).Take(listCount).ToListAsync();
 
             // 검색어 입력에 따른 필터링(책제목 기준)
-            // 1. 검색어 중 한글은 인식되지 않음(퍼센트 인코딩 형태로 인식됨)
-            // 2. 짧은 시간 안에 검색을 연속 수행하면 오류 발생
+            // 짧은 시간 안에 검색을 연속 수행하면 오류 발생
             // (An unhandled exception occurred while processing the request.)
-            if (queryStr[0] == "?keyword" && !string.IsNullOrWhiteSpace(queryStr[1]))
-                books = _context.Book.Where(x => x.Title.Contains(queryStr[1]))
+            if (queryStr[0] == "?keyword" && !string.IsNullOrWhiteSpace(queryStr[1])) {
+                // URL 인코딩(퍼센트 인코딩) 형태의 문자열을 (한글 깨짐 해결)
+                string queryStrDecode = HttpUtility.UrlDecode(queryStr[1]);
+
+                books = _context.Book.Where(x => x.Title.Contains(queryStrDecode))
                         .OrderBy(x => x.Book_U)
                         .Skip(startNum).Take(listCount).ToListAsync();
+
+            }
 
             return View(await books);
         }
