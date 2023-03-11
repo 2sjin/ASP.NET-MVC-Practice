@@ -19,9 +19,11 @@ namespace LibraryApp.Controllers {
 
         // GET: Home
         public async Task<IActionResult> Index() {
-            // 페이징(Paging)
+            // 페이징(Paging) 관련 변수
             int listCount = 5;      // 한 번에 표시할 레코드 수
             int pageNum = 1;        // 현재 페이지 번호
+            int startNum = (pageNum - 1) * listCount;   // 페이지별 시작값
+            Task<List<Book>> books;     // 출력할 도서 목록을 저장할 리스트
 
             // 쿼리 스트링을 배열 형태로 저장
             // 예) ["?page", 1]
@@ -31,28 +33,27 @@ namespace LibraryApp.Controllers {
             if (queryStr[0] == "?page" && queryStr[1] != null)
                 pageNum = Convert.ToInt32(queryStr[1]);
 
-            // 페이지 정보를 뷰에 전달
+            // 페이지 정보를 뷰에 전달(ViewBag)
             ViewBag.PageNum = pageNum;
             ViewBag.PageNumMax = (int) ((_context.Book.Count() - 1) / listCount) + 1;
 
-            // listCount개 만큼만 레코드 출력
-            int startNum = (pageNum - 1) * listCount;
-            var books = _context.Book.OrderBy(x => x.Book_U)
-                        .Skip(startNum).Take(listCount).ToListAsync();
-
             // 검색어 입력에 따른 필터링(책제목 기준)
-            // 짧은 시간 안에 검색을 연속 수행하면 오류 발생
-            // (An unhandled exception occurred while processing the request.)
             if (queryStr[0] == "?keyword" && !string.IsNullOrWhiteSpace(queryStr[1])) {
                 // URL 인코딩(퍼센트 인코딩) 형태의 문자열을 (한글 깨짐 해결)
                 string queryStrDecode = HttpUtility.UrlDecode(queryStr[1]);
-
                 books = _context.Book.Where(x => x.Title.Contains(queryStrDecode))
                         .OrderBy(x => x.Book_U)
                         .Skip(startNum).Take(listCount).ToListAsync();
 
             }
 
+            // 검색어 입력이 아닌 경우, 전체 레코드를 페이징하여 출력
+            else {
+                books = _context.Book.OrderBy(x => x.Book_U)
+                        .Skip(startNum).Take(listCount).ToListAsync();
+            }
+
+            // 출력할 도서 리스트를 뷰에 전달(return)
             return View(await books);
         }
 
