@@ -42,10 +42,23 @@ namespace LibraryApp.Controllers {
             ViewBag.PageNum = pageNum;
 
             // 검색어 입력에 따른 필터링(책제목 기준)
-            if (queryStr.Length >= 4 && queryStr[3] == "keyword" && !string.IsNullOrWhiteSpace(queryStr[4])) {
+            if (queryStr.Length >= 4 && queryStr[1] == "searchKind" && queryStr[3] == "keyword" && !string.IsNullOrWhiteSpace(queryStr[4])) {
                 // URL 인코딩(퍼센트 인코딩) 형태의 문자열을 (한글 깨짐 해결)
                 string queryStrDecode = HttpUtility.UrlDecode(queryStr[4]);
-                books = _context.Book.Where(x => x.Title.Contains(queryStrDecode));
+                switch(queryStr[2]) {
+                    case "Title":
+                        books = _context.Book.Where(x => x.Title.Contains(queryStrDecode));
+                        break;
+                    case "Writer":
+                        books = _context.Book.Where(x => x.Writer.Contains(queryStrDecode));
+                        break;
+                    case "Publisher":
+                        books = _context.Book.Where(x => x.Publisher.Contains(queryStrDecode));
+                        break;
+                    default:
+                        books = _context.Book.Where(x => x.Title.Contains(queryStrDecode));
+                        break;
+                }
                 ViewBag.PageNumMax = (int)((books.Count() - 1) / listCount) + 1;     // 최대 페이지 수를 뷰에 전달(ViewBag)
                 books = books.OrderBy(x => x.Book_U)
                         .Skip(firstRecordNum).Take(listCount);
