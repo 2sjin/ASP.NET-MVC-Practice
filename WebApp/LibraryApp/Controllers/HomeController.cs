@@ -36,23 +36,24 @@ namespace LibraryApp.Controllers {
             // 현재 페이지의 첫 레코드의 기본키를 갱신함
             firstRecordNum = (pageNum - 1) * listCount;
 
-            // 페이지 정보를 뷰에 전달(ViewBag)
+            // 현재 페이지 번호를 뷰에 전달(ViewBag)
             ViewBag.PageNum = pageNum;
-            ViewBag.PageNumMax = (int) ((_context.Book.Count() - 1) / listCount) + 1;
 
             // 검색어 입력에 따른 필터링(책제목 기준)
             if (queryStr[0] == "?keyword" && !string.IsNullOrWhiteSpace(queryStr[1])) {
                 // URL 인코딩(퍼센트 인코딩) 형태의 문자열을 (한글 깨짐 해결)
                 string queryStrDecode = HttpUtility.UrlDecode(queryStr[1]);
-                books = _context.Book.Where(x => x.Title.Contains(queryStrDecode))
-                        .OrderBy(x => x.Book_U)
+                books = _context.Book.Where(x => x.Title.Contains(queryStrDecode));
+                ViewBag.PageNumMax = (int)((books.Count() - 1) / listCount) + 1;     // 최대 페이지 수를 뷰에 전달(ViewBag)
+                books = books.OrderBy(x => x.Book_U)
                         .Skip(firstRecordNum).Take(listCount);
-
             }
 
             // 검색어 입력이 아닌 경우, 전체 레코드를 페이징하여 출력
             else {
-                books = _context.Book.OrderBy(x => x.Book_U)
+                books = _context.Book;
+                ViewBag.PageNumMax = (int)((books.Count() - 1) / listCount) + 1;      // 최대 페이지 수를 뷰에 전달(ViewBag)
+                books = books.OrderBy(x => x.Book_U)
                         .Skip(firstRecordNum).Take(listCount);
             }
 
