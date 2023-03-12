@@ -22,16 +22,19 @@ namespace LibraryApp.Controllers {
             // 페이징(Paging) 관련 변수
             int listCount = 5;      // 한 번에 표시할 레코드 수
             int pageNum = 1;        // 현재 페이지 번호
-            int startNum = (pageNum - 1) * listCount;   // 페이지별 시작값
+            int firstRecordNum = 0;     // 현재 페이지의 첫 레코드의 기본키
             Task<List<Book>> books;     // 출력할 도서 목록을 저장할 리스트
 
             // 쿼리 스트링을 배열 형태로 저장
             // 예) ["?page", 1]
             string[] queryStr = Request.QueryString.ToString().Split("=");  
 
-            // 쿼리스트링에 저장된 현재 페이지를 정수 형태로 저장
+            // 쿼리스트링의 파라미터가 'page'인 경우, 쿼리스트링 값(현재 페이지)을 정수 형태로 저장
             if (queryStr[0] == "?page" && queryStr[1] != null)
                 pageNum = Convert.ToInt32(queryStr[1]);
+
+            // 현재 페이지의 첫 레코드의 기본키를 갱신함
+            firstRecordNum = (pageNum - 1) * listCount;
 
             // 페이지 정보를 뷰에 전달(ViewBag)
             ViewBag.PageNum = pageNum;
@@ -43,14 +46,14 @@ namespace LibraryApp.Controllers {
                 string queryStrDecode = HttpUtility.UrlDecode(queryStr[1]);
                 books = _context.Book.Where(x => x.Title.Contains(queryStrDecode))
                         .OrderBy(x => x.Book_U)
-                        .Skip(startNum).Take(listCount).ToListAsync();
+                        .Skip(firstRecordNum).Take(listCount).ToListAsync();
 
             }
 
             // 검색어 입력이 아닌 경우, 전체 레코드를 페이징하여 출력
             else {
                 books = _context.Book.OrderBy(x => x.Book_U)
-                        .Skip(startNum).Take(listCount).ToListAsync();
+                        .Skip(firstRecordNum).Take(listCount).ToListAsync();
             }
 
             // 출력할 도서 리스트를 뷰에 전달(return)
