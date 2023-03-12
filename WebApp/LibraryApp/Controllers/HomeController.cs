@@ -23,7 +23,7 @@ namespace LibraryApp.Controllers {
             int listCount = 5;      // 한 번에 표시할 레코드 수
             int pageNum = 1;        // 현재 페이지 번호
             int firstRecordNum = 0;     // 현재 페이지의 첫 레코드의 기본키
-            Task<List<Book>> books;     // 출력할 도서 목록을 저장할 리스트
+            IQueryable<Book> books;     // 출력할 도서 목록을 저장할 쿼리 인터페이스
 
             // 쿼리 스트링을 배열 형태로 저장
             // 예) ["?page", 1]
@@ -46,18 +46,18 @@ namespace LibraryApp.Controllers {
                 string queryStrDecode = HttpUtility.UrlDecode(queryStr[1]);
                 books = _context.Book.Where(x => x.Title.Contains(queryStrDecode))
                         .OrderBy(x => x.Book_U)
-                        .Skip(firstRecordNum).Take(listCount).ToListAsync();
+                        .Skip(firstRecordNum).Take(listCount);
 
             }
 
             // 검색어 입력이 아닌 경우, 전체 레코드를 페이징하여 출력
             else {
                 books = _context.Book.OrderBy(x => x.Book_U)
-                        .Skip(firstRecordNum).Take(listCount).ToListAsync();
+                        .Skip(firstRecordNum).Take(listCount);
             }
 
             // 출력할 도서 리스트를 뷰에 전달(return)
-            return View(await books);
+            return View(await books.ToListAsync());
         }
 
         // GET: Home/Details/5
